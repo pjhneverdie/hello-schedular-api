@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 public class Schedule {
     @NotNull
-    private Long id;
+    private int id;
 
     @NotNull
     private LocalDateTime dateTime;
