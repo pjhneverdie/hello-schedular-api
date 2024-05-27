@@ -1,7 +1,7 @@
 package scheduleApi.schedule.exception;
 
-import scheduleApi.common.exception.CustomException;
-import scheduleApi.common.exception.ErrorCode;
+import scheduleApi.schedule.common.exception.CustomException;
+import scheduleApi.schedule.common.exception.ErrorCode;
 
 public class ScheduleException extends CustomException {
     public ScheduleException(ErrorCode errorCode) {

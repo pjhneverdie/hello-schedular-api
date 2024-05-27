@@ -1,4 +1,4 @@
-package scheduleApi.common.exception;
+package scheduleApi.schedule.common.exception;
 
 import org.springframework.http.HttpStatus;
 
@@ -8,6 +8,4 @@ public interface ErrorCode {
     HttpStatus httpStatus();
 
     RuntimeException exception();
-
-    RuntimeException exception(Throwable cause);
 }

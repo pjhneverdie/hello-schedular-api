@@ -2,7 +2,8 @@ package scheduleApi.schedule.exception;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import scheduleApi.common.exception.ErrorCode;
+import scheduleApi.schedule.common.exception.CustomException;
+import scheduleApi.schedule.common.exception.ErrorCode;
 
 @RequiredArgsConstructor
 public enum ScheduleErrorCode implements ErrorCode {
@@ -24,11 +25,10 @@ public enum ScheduleErrorCode implements ErrorCode {
         return new ScheduleException(this);
     }
 
-    @Override
-    public RuntimeException exception(Throwable cause) {
-        return new ScheduleException(this, cause);
-    }
-
     private final String message;
     private final HttpStatus httpStatus;
+
+    public CustomException toException() {
+        return new ScheduleException(this);
+    }
 }

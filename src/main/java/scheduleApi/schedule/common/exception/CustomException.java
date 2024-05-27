@@ -1,8 +1,10 @@
-package scheduleApi.common.exception;
+package scheduleApi.schedule.common.exception;
 
+import lombok.Getter;
 
+@Getter
 public class CustomException extends RuntimeException {
-    public final ErrorCode errorCode;
+    private final ErrorCode errorCode;
 
     public CustomException(ErrorCode errorCode) {
         this.errorCode = errorCode;
