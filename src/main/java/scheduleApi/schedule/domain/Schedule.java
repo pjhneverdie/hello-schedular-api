@@ -6,12 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Setter
 @Getter
+@Setter
 public class Schedule {
-    @NotNull
-    private int id;
-
     @NotNull
     private LocalDateTime dateTime;
 

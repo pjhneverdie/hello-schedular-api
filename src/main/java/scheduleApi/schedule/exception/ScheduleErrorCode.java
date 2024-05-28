@@ -9,7 +9,6 @@ import scheduleApi.schedule.common.exception.ErrorCode;
 public enum ScheduleErrorCode implements ErrorCode {
     DATABASE_EXCEPTION("서버 오류 발생!", HttpStatus.INTERNAL_SERVER_ERROR);
 
-
     @Override
     public String message() {
         return message;
