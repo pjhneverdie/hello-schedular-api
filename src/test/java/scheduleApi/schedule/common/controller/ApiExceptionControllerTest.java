@@ -25,7 +25,7 @@ public class ApiExceptionControllerTest {
     private ScheduleService scheduleService;
 
     @Test
-    void handleExceptionTest() throws Exception {
+    void handleNotFoundExceptionTest() throws Exception {
         mockMvc.perform(get("/some-invalid-url"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_FOUND.message()));
