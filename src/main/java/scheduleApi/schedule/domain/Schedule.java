@@ -1,22 +1,28 @@
 package scheduleApi.schedule.domain;
 
-import jakarta.validation.constraints.*;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 public class Schedule {
-    @NotNull
-    private LocalDateTime dateTime;
+    private final LocalDateTime dateTime;
 
-    @Size(min = 1, max = 25, message = "제목은 1자 이상 25자 이하여야 합니다.")
-    @NotBlank(message = "제목을 입력해 주세요.")
-    private String title;
+    private final String title;
 
-    private String memo;
+    private final String memo;
+
+    @JsonCreator
+    public Schedule(
+            @JsonProperty("dateTime") LocalDateTime dateTime,
+            @JsonProperty("title") String title,
+            @JsonProperty("memo") String memo) {
+        this.dateTime = dateTime;
+        this.title = title;
+        this.memo = memo;
+    }
 }
 
 

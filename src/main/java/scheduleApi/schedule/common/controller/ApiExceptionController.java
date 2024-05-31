@@ -51,7 +51,6 @@ public class ApiExceptionController {
     // 나머지 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleServerException(Exception e) {
-        log.error("error", e);
         final GlobalException globalException = new GlobalException(GlobalErrorCode.INTERNAL_SERVER_ERROR);
         final ErrorResponse errorResponse = new ErrorResponse(globalException);
         return new ResponseEntity<>(errorResponse, errorResponse.getEnumHttpStatus());
@@ -60,7 +59,6 @@ public class ApiExceptionController {
     // 요청 URL 매칭 불가한 상황
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(Exception e) {
-        log.error("error", e);
         final GlobalException globalException = new GlobalException(GlobalErrorCode.NOT_FOUND);
         final ErrorResponse errorResponse = new ErrorResponse(globalException);
         return new ResponseEntity<>(errorResponse, errorResponse.getEnumHttpStatus());
