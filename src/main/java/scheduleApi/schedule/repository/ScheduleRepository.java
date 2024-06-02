@@ -2,8 +2,10 @@ package scheduleApi.schedule.repository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,6 +19,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Repository
@@ -26,7 +31,7 @@ public class ScheduleRepository {
     private final JdbcTemplate template;
 
     public ScheduleDto save(Schedule schedule) {
-        final String sql = "insert into schedule(dateTime, title, memo) values(?, ?, ?)";
+        final String sql = "insert into schedule(dateTimㄴㄴe, title, memo) values(?, ?, ?)";
 
         final KeyHolder keyHolder = new GeneratedKeyHolder();
         template.update(new PreparedStatementCreator() {
@@ -50,20 +55,23 @@ public class ScheduleRepository {
 
     public ScheduleDto read(int id) {
         final String sql = "select * from schedule where id = ?";
-        final ScheduleDto scheduleDto = template.queryForObject(sql, scheduleRowMapper(), id);
-        return scheduleDto;
+        return template.queryForObject(sql, scheduleRowMapper(), id);
+    }
+
+    public List<ScheduleDto> read(LocalDate date) {
+        final String sql = "SELECT * FROM Schedule WHERE DATE(dateTime) = :date";
+        return template.query(sql, scheduleRowMapper(), date);
     }
 
     private RowMapper<ScheduleDto> scheduleRowMapper() {
         return (rs, rowNum) -> {
-            ScheduleDto scheduleDto = new ScheduleDto(
+            return new ScheduleDto(
                     rs.getInt("id"),
                     rs.getTimestamp("dateTime").toLocalDateTime(),
                     rs.getString("title"),
                     rs.getString("memo")
             );
-
-            return scheduleDto;
         };
     }
+
 }

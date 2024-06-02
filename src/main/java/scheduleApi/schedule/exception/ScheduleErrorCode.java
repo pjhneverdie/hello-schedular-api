@@ -26,8 +26,4 @@ public enum ScheduleErrorCode implements ErrorCode {
 
     private final String message;
     private final HttpStatus httpStatus;
-
-    public CustomException toException() {
-        return new ScheduleException(this);
-    }
 }
