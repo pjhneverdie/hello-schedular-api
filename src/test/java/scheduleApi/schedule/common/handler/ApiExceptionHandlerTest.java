@@ -7,12 +7,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import scheduleApi.schedule.domain.Schedule;
-import scheduleApi.schedule.repository.dto.ScheduleSaveDto;
+import scheduleApi.schedule.controller.form.ScheduleSaveForm;
 import scheduleApi.schedule.service.ScheduleService;
 import scheduleApi.schedule.exception.ScheduleErrorCode;
-
-import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -47,7 +44,7 @@ public class ApiExceptionHandlerTest {
                 "    \"memo\": \"memo\"\n" +
                 "}";
 
-        mockMvc.perform(post("/schedule/save")
+        mockMvc.perform(post("/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -62,7 +59,7 @@ public class ApiExceptionHandlerTest {
                 "    \"memo\": \"memo\"\n" +
                 "}";
 
-        mockMvc.perform(post("/schedule/save")
+        mockMvc.perform(post("/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -74,7 +71,7 @@ public class ApiExceptionHandlerTest {
     void handleCustomExceptionTest() throws Exception {
         doThrow(ScheduleErrorCode.SOME_SCHEDULE_ERROR.exception())
                 .when(scheduleService)
-                .save(any(ScheduleSaveDto.class));
+                .save(any(ScheduleSaveForm.class));
 
         // 클라이언트는 잘못이 없음
         final String requestBody = "{\n" +
@@ -83,7 +80,7 @@ public class ApiExceptionHandlerTest {
                 "    \"memo\": \"valid memo\"\n" +
                 "}";
 
-        mockMvc.perform(post("/schedule/save")
+        mockMvc.perform(post("/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isInternalServerError())

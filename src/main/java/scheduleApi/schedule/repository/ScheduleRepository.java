@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -12,7 +11,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import scheduleApi.schedule.domain.Schedule;
-import scheduleApi.schedule.repository.dto.ScheduleUpdateDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,20 +32,14 @@ public class ScheduleRepository {
     }
 
 
-    public ScheduleUpdateDto save(Schedule schedule) {
+    public Schedule save(Schedule schedule) {
         final BeanPropertySqlParameterSource param = new BeanPropertySqlParameterSource(schedule);
         final Number id = simpleJdbcInsert.executeAndReturnKey(param);
 
-        final ScheduleUpdateDto scheduleUpdateDto = new ScheduleUpdateDto();
-        scheduleUpdateDto.setId(id.intValue());
-        scheduleUpdateDto.setDateTime(schedule.getDateTime());
-        scheduleUpdateDto.setTitle(schedule.getTitle());
-        scheduleUpdateDto.setMemo(schedule.getMemo());
-
-        return scheduleUpdateDto;
+        return new Schedule(id.intValue(), schedule.getDateTime(), schedule.getTitle(), schedule.getMemo());
     }
 
-    public List<ScheduleUpdateDto> findByDate(LocalDate date) {
+    public List<Schedule> findByDate(LocalDate date) {
         final String sql = "SELECT * FROM schedule WHERE DATE(date_time) = :date";
 
         final Map<String, LocalDate> param = Map.of("date", date);
@@ -56,16 +48,14 @@ public class ScheduleRepository {
     }
 
 
-    public ScheduleUpdateDto update(ScheduleUpdateDto scheduleUpdateDto) {
+    public void update(Schedule schedule) {
         final String sql = "UPDATE schedule " +
                 "SET date_time = :dateTime, title = :title, memo = :memo " +
                 "WHERE id = :id";
 
-        final BeanPropertySqlParameterSource param = new BeanPropertySqlParameterSource(scheduleUpdateDto);
+        final BeanPropertySqlParameterSource param = new BeanPropertySqlParameterSource(schedule);
 
         template.update(sql, param);
-
-        return scheduleUpdateDto;
     }
 
     public void delete(int id) {
@@ -86,7 +76,15 @@ public class ScheduleRepository {
         template.update(sql, param);
     }
 
-    private RowMapper<ScheduleUpdateDto> scheduleRowMapper() {
-        return new BeanPropertyRowMapper<>(ScheduleUpdateDto.class);
+    private RowMapper<Schedule> scheduleRowMapper() {
+        return ((rs, rowNum) -> {
+            final Schedule schedule = new Schedule(
+                    rs.getInt("id"),
+                    rs.getTimestamp("date_time").toLocalDateTime(),
+                    rs.getString("title"),
+                    rs.getString("memo"));
+
+            return schedule;
+        });
     }
 }

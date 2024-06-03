@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import scheduleApi.schedule.domain.Schedule;
-import scheduleApi.schedule.repository.dto.ScheduleUpdateDto;
 
 import javax.sql.DataSource;
 
@@ -51,7 +50,7 @@ class ScheduleRepositoryTest {
                 "memo");
 
         // When
-        final ScheduleUpdateDto saved = repository.save(schedule);
+        final Schedule saved = repository.save(schedule);
 
         // Then
         assertThat(saved.getDateTime()).isEqualTo(schedule.getDateTime());
@@ -67,10 +66,10 @@ class ScheduleRepositoryTest {
                 "title",
                 "memo");
 
-        final ScheduleUpdateDto saved = repository.save(schedule);
+        final Schedule saved = repository.save(schedule);
 
         // When
-        final List<ScheduleUpdateDto> allByDate = repository.findByDate(saved.getDateTime().toLocalDate());
+        final List<Schedule> allByDate = repository.findByDate(saved.getDateTime().toLocalDate());
 
         // Then
         assertThat(allByDate).isNotEmpty();
@@ -79,21 +78,26 @@ class ScheduleRepositoryTest {
     @Test
     void update() {
         // Given
-        final Schedule schedule = new Schedule(
+        Schedule schedule = new Schedule(
                 LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul"))),
                 "title",
                 "memo");
 
-        final ScheduleUpdateDto saved = repository.save(schedule);
-        saved.setDateTime(LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul"))));
-        saved.setTitle("title2");
-        saved.setMemo("memo2");
+        final Schedule saved = repository.save(schedule);
 
         // When
-        ScheduleUpdateDto updated = repository.update(saved);
+        schedule = new Schedule(
+                saved.getId(),
+                LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul"))),
+                "updated title",
+                "updated memo");
+
+        repository.update(schedule);
 
         // Then
-        assertThat(updated.getId()).isEqualTo(saved.getId());
+        List<Schedule> allByDate = repository.findByDate(schedule.getDateTime().toLocalDate());
+
+        assertThat(allByDate.stream().findFirst().isPresent()).isTrue();
     }
 
     @Test
@@ -104,15 +108,15 @@ class ScheduleRepositoryTest {
                 "title",
                 "memo");
 
-        final ScheduleUpdateDto saved = repository.save(schedule);
+        final Schedule saved = repository.save(schedule);
 
         // When
         repository.delete(saved.getId());
 
-        final List<ScheduleUpdateDto> allByDate = repository.findByDate(saved.getDateTime().toLocalDate());
-
         // Then
-        assertThat(allByDate).isEmpty();
+        final List<Schedule> allByDate = repository.findByDate(saved.getDateTime().toLocalDate());
+
+        assertThat(allByDate.contains(schedule)).isFalse();
     }
 
     @Test
@@ -123,14 +127,14 @@ class ScheduleRepositoryTest {
                 "title",
                 "memo");
 
-        final ScheduleUpdateDto saved = repository.save(schedule);
+        final Schedule saved = repository.save(schedule);
 
         // When
         repository.deleteByDate(saved.getDateTime().toLocalDate());
 
-        final List<ScheduleUpdateDto> allByDate = repository.findByDate(saved.getDateTime().toLocalDate());
-
         // Then
+        final List<Schedule> allByDate = repository.findByDate(saved.getDateTime().toLocalDate());
+
         assertThat(allByDate).isEmpty();
     }
 }

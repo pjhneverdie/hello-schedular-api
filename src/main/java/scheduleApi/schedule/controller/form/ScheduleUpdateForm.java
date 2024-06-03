@@ -1,4 +1,4 @@
-package scheduleApi.schedule.repository.dto;
+package scheduleApi.schedule.controller.form;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -6,13 +6,15 @@ import jakarta.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.Setter;
-import scheduleApi.schedule.domain.Schedule;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class ScheduleSaveDto {
+public class ScheduleUpdateForm {
+    @NotNull
+    private int id;
+
     @NotNull
     private LocalDateTime dateTime;
 
@@ -21,8 +23,4 @@ public class ScheduleSaveDto {
     private String title;
 
     private String memo;
-
-    public Schedule toEntity() {
-        return new Schedule(this.dateTime, this.title, this.memo);
-    }
 }

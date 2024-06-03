@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import scheduleApi.schedule.repository.dto.ScheduleSaveDto;
-import scheduleApi.schedule.repository.dto.ScheduleUpdateDto;
+import scheduleApi.schedule.domain.Schedule;
+import scheduleApi.schedule.controller.form.ScheduleSaveForm;
+import scheduleApi.schedule.controller.form.ScheduleUpdateForm;
 import scheduleApi.schedule.repository.ScheduleRepository;
 
 import java.time.LocalDate;
@@ -16,16 +17,27 @@ import java.util.List;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
-    public ScheduleUpdateDto save(ScheduleSaveDto scheduleSaveDto) {
-        return scheduleRepository.save(scheduleSaveDto.toEntity());
+    public Schedule save(ScheduleSaveForm scheduleSaveForm) {
+        final Schedule schedule = new Schedule(
+                scheduleSaveForm.getDateTime(),
+                scheduleSaveForm.getTitle(),
+                scheduleSaveForm.getMemo());
+
+        return scheduleRepository.save(schedule);
     }
 
-    public List<ScheduleUpdateDto> findByDate(LocalDate date) {
+    public List<Schedule> findByDate(LocalDate date) {
         return scheduleRepository.findByDate(date);
     }
 
-    public ScheduleUpdateDto update(ScheduleUpdateDto scheduleUpdateDto) {
-        return scheduleRepository.update(scheduleUpdateDto);
+    public void update(ScheduleUpdateForm scheduleUpdateForm) {
+        final Schedule schedule = new Schedule(
+                scheduleUpdateForm.getId(),
+                scheduleUpdateForm.getDateTime(),
+                scheduleUpdateForm.getTitle(),
+                scheduleUpdateForm.getMemo());
+
+        scheduleRepository.update(schedule);
     }
 
     public void delete(int id) {

@@ -65,7 +65,6 @@ public class ApiExceptionHandler {
         private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         private final static String MESSAGE_HOLDER = " 필드의 값 검증에 실패했습니다!";
 
-
         @Override
         public String message() {
             return this.message;
