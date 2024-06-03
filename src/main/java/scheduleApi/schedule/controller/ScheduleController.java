@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/schedule")
+@RequestMapping("/schedules")
 @RestController
 public class ScheduleController {
     private final ScheduleService scheduleService;
