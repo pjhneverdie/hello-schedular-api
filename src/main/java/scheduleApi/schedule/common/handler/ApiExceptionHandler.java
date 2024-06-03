@@ -1,4 +1,4 @@
-package scheduleApi.schedule.common.controller;
+package scheduleApi.schedule.common.handler;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
-public class ApiExceptionController {
+public class ApiExceptionHandler {
 
     private static class GlobalException extends CustomException {
         public GlobalException(ErrorCode errorCode) {
@@ -32,6 +32,8 @@ public class ApiExceptionController {
         NOT_FOUND("요청 URL을 다시 확인해 주세요!", HttpStatus.NOT_FOUND),
         BAD_REQUEST("파람, 바디 등 양식을 다시 확인해 주세요!", HttpStatus.BAD_REQUEST),
         INTERNAL_SERVER_ERROR("서버에 문제가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+
+        // HttpRequestMethodNotSupportedException도 추가해야 할 듯
 
         @Override
         public String message() {
@@ -48,13 +50,17 @@ public class ApiExceptionController {
             return new GlobalException(this);
         }
 
+        public CustomException toCustomException() {
+            return new CustomException(this);
+        }
+
         private final String message;
         private final HttpStatus httpStatus;
     }
 
     @Getter
     @RequiredArgsConstructor
-    private static class GlobalValidationErrorCode implements ErrorCode {
+    public static class GlobalValidationErrorCode implements ErrorCode {
         private final String message;
         private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         private final static String MESSAGE_HOLDER = " 필드의 값 검증에 실패했습니다!";
@@ -74,13 +80,17 @@ public class ApiExceptionController {
         public RuntimeException exception() {
             return new GlobalException(this);
         }
+
+        public CustomException toCustomException() {
+            return new CustomException(this);
+        }
     }
 
     // 나머지 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleServerException(Exception e) {
-        final GlobalException globalException = new GlobalException(GlobalErrorCode.INTERNAL_SERVER_ERROR);
-        final ErrorResponse errorResponse = new ErrorResponse(globalException);
+        final ErrorResponse errorResponse = new ErrorResponse(
+                GlobalErrorCode.INTERNAL_SERVER_ERROR.toCustomException());
 
         return new ResponseEntity<>(errorResponse, errorResponse.getEnumHttpStatus());
     }
@@ -88,8 +98,8 @@ public class ApiExceptionController {
     // 요청 URL 매칭 불가한 상황
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(Exception e) {
-        final GlobalException globalException = new GlobalException(GlobalErrorCode.NOT_FOUND);
-        final ErrorResponse errorResponse = new ErrorResponse(globalException);
+        final ErrorResponse errorResponse = new ErrorResponse(
+                GlobalErrorCode.NOT_FOUND.toCustomException());
 
         return new ResponseEntity<>(errorResponse, errorResponse.getEnumHttpStatus());
     }
@@ -97,8 +107,8 @@ public class ApiExceptionController {
     // 바인딩 예외 처리(요청 객체의 타입이 필드와 일치하지 않을 때)
     @ExceptionHandler(HttpMessageConversionException.class)
     public ResponseEntity<ErrorResponse> handleBindException() {
-        final GlobalException globalException = new GlobalException(GlobalErrorCode.BAD_REQUEST);
-        final ErrorResponse errorResponse = new ErrorResponse(globalException);
+        final ErrorResponse errorResponse = new ErrorResponse(
+                GlobalErrorCode.BAD_REQUEST.toCustomException());
 
         return new ResponseEntity<>(errorResponse, errorResponse.getEnumHttpStatus());
     }
@@ -115,10 +125,8 @@ public class ApiExceptionController {
                         // 기본 메시지(xx 필드 값 검증에 실패했습니다!) 사용
                         fieldError.getField() + GlobalValidationErrorCode.MESSAGE_HOLDER).collect(Collectors.toList());
 
-        final String combinedErrorMessage = String.join(", ", errorMessages);
-
-        final GlobalException globalException = new GlobalException(new GlobalValidationErrorCode(combinedErrorMessage));
-        final ErrorResponse errorResponse = new ErrorResponse(globalException);
+        final ErrorResponse errorResponse = new ErrorResponse(
+                new GlobalValidationErrorCode(String.join(", ", errorMessages)).toCustomException());
 
         return new ResponseEntity<>(errorResponse, errorResponse.getEnumHttpStatus());
     }

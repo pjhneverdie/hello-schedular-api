@@ -1,18 +1,23 @@
-package scheduleApi.schedule.domain;
+package scheduleApi.schedule.repository.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import scheduleApi.schedule.domain.Schedule;
 
 import java.time.LocalDateTime;
 
-// DTO는 Setter 써도 괜찮을 듯 어차피 데이터 전달 목적이니까
+
 @Getter
 @Setter
-public class ScheduleCreateRequestDto {
+public class ScheduleUpdateDto {
+    @NotNull
+    private int id;
+
     @NotNull
     private LocalDateTime dateTime;
 
@@ -24,5 +29,15 @@ public class ScheduleCreateRequestDto {
 
     public Schedule toEntity() {
         return new Schedule(this.dateTime, this.title, this.memo);
+    }
+
+    @Override
+    public String toString() {
+        return "ScheduleUpdateDto{" +
+                "id=" + id +
+                ", dateTime=" + dateTime +
+                ", title='" + title + '\'' +
+                ", memo='" + memo + '\'' +
+                '}';
     }
 }

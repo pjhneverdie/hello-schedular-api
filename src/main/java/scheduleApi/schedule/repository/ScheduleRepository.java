@@ -2,76 +2,91 @@ package scheduleApi.schedule.repository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import scheduleApi.schedule.domain.Schedule;
-import scheduleApi.schedule.domain.ScheduleDto;
+import scheduleApi.schedule.repository.dto.ScheduleUpdateDto;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
 @RequiredArgsConstructor
 public class ScheduleRepository {
 
-    private final JdbcTemplate template;
+    private final NamedParameterJdbcTemplate template;
+    private SimpleJdbcInsert simpleJdbcInsert;
 
-    public ScheduleDto save(Schedule schedule) {
-        final String sql = "insert into schedule(dateTimㄴㄴe, title, memo) values(?, ?, ?)";
-
-        final KeyHolder keyHolder = new GeneratedKeyHolder();
-        template.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                final PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-                ps.setTimestamp(1, Timestamp.valueOf(schedule.getDateTime()));
-                ps.setString(2, schedule.getTitle());
-                ps.setString(3, schedule.getMemo());
-                return ps;
-            }
-        }, keyHolder);
-
-        return new ScheduleDto(
-                keyHolder.getKey().intValue(),
-                schedule.getDateTime(),
-                schedule.getTitle(),
-                schedule.getMemo()
-        );
+    @EventListener(ApplicationReadyEvent.class)
+    public void initData() {
+        this.simpleJdbcInsert = new SimpleJdbcInsert(template.getJdbcTemplate())
+                .withTableName("schedule")
+                .usingGeneratedKeyColumns("id");
     }
 
-    public ScheduleDto read(int id) {
-        final String sql = "select * from schedule where id = ?";
-        return template.queryForObject(sql, scheduleRowMapper(), id);
+
+    public ScheduleUpdateDto save(Schedule schedule) {
+        final BeanPropertySqlParameterSource param = new BeanPropertySqlParameterSource(schedule);
+        final Number id = simpleJdbcInsert.executeAndReturnKey(param);
+
+        final ScheduleUpdateDto scheduleUpdateDto = new ScheduleUpdateDto();
+        scheduleUpdateDto.setId(id.intValue());
+        scheduleUpdateDto.setDateTime(schedule.getDateTime());
+        scheduleUpdateDto.setTitle(schedule.getTitle());
+        scheduleUpdateDto.setMemo(schedule.getMemo());
+
+        return scheduleUpdateDto;
     }
 
-    public List<ScheduleDto> read(LocalDate date) {
-        final String sql = "SELECT * FROM Schedule WHERE DATE(dateTime) = :date";
-        return template.query(sql, scheduleRowMapper(), date);
+    public List<ScheduleUpdateDto> findByDate(LocalDate date) {
+        final String sql = "SELECT * FROM schedule WHERE DATE(date_time) = :date";
+
+        final Map<String, LocalDate> param = Map.of("date", date);
+
+        return template.query(sql, param, scheduleRowMapper());
     }
 
-    private RowMapper<ScheduleDto> scheduleRowMapper() {
-        return (rs, rowNum) -> {
-            return new ScheduleDto(
-                    rs.getInt("id"),
-                    rs.getTimestamp("dateTime").toLocalDateTime(),
-                    rs.getString("title"),
-                    rs.getString("memo")
-            );
-        };
+
+    public ScheduleUpdateDto update(ScheduleUpdateDto scheduleUpdateDto) {
+        final String sql = "UPDATE schedule " +
+                "SET date_time = :dateTime, title = :title, memo = :memo " +
+                "WHERE id = :id";
+
+        final BeanPropertySqlParameterSource param = new BeanPropertySqlParameterSource(scheduleUpdateDto);
+
+        template.update(sql, param);
+
+        return scheduleUpdateDto;
     }
 
+    public void delete(int id) {
+        final String sql = "DELETE FROM schedule " +
+                "WHERE id = :id";
+
+        final Map<String, Integer> param = Map.of("id", id);
+
+        template.update(sql, param);
+    }
+
+    public void deleteByDate(LocalDate date) {
+        final String sql = "DELETE FROM schedule " +
+                "WHERE DATE(date_time) = :date";
+
+        final Map<String, LocalDate> param = Map.of("date", date);
+
+        template.update(sql, param);
+    }
+
+    private RowMapper<ScheduleUpdateDto> scheduleRowMapper() {
+        return new BeanPropertyRowMapper<>(ScheduleUpdateDto.class);
+    }
 }

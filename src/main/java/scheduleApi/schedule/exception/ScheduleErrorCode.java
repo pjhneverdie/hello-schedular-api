@@ -7,7 +7,7 @@ import scheduleApi.schedule.common.exception.ErrorCode;
 
 @RequiredArgsConstructor
 public enum ScheduleErrorCode implements ErrorCode {
-    SCHEDULE_ERROR_CODE_NOT_FOUND("", HttpStatus.INTERNAL_SERVER_ERROR);
+    SOME_SCHEDULE_ERROR("스케쥴을 저장할 수 없습니다 ㅠ", HttpStatus.INTERNAL_SERVER_ERROR);
 
     @Override
     public String message() {
@@ -22,6 +22,10 @@ public enum ScheduleErrorCode implements ErrorCode {
     @Override
     public RuntimeException exception() {
         return new ScheduleException(this);
+    }
+
+    CustomException toCustomException() {
+        return new CustomException(this);
     }
 
     private final String message;
