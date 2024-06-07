@@ -117,12 +117,13 @@ public class ApiExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
         // 벨리데이션 실패 메시지 추출
-        final List<String> errorMessages = e.getBindingResult().getFieldErrors().stream().map(
+        // * getAllErrors = 클래스 레벨 예외도 포함해서 가져오기
+        final List<String> errorMessages = e.getBindingResult().getAllErrors().stream().map(
                 fieldError -> fieldError.getDefaultMessage() != null ?
                         fieldError.getDefaultMessage() :
                         // 벨리데이션 실패 메시지가 따로 정의되지 않은 경우
                         // 기본 메시지(xx 필드 값 검증에 실패했습니다!) 사용
-                        fieldError.getField() + GlobalValidationErrorCode.MESSAGE_HOLDER).collect(Collectors.toList());
+                        fieldError.getObjectName() + GlobalValidationErrorCode.MESSAGE_HOLDER).collect(Collectors.toList());
 
         final ErrorResponse errorResponse = new ErrorResponse(
                 new GlobalValidationErrorCode(String.join(", ", errorMessages)).toCustomException());

@@ -36,7 +36,8 @@ public class ScheduleRepository {
         final BeanPropertySqlParameterSource param = new BeanPropertySqlParameterSource(schedule);
         final Number id = simpleJdbcInsert.executeAndReturnKey(param);
 
-        return new Schedule(id.intValue(), schedule.getDateTime(), schedule.getTitle(), schedule.getMemo());
+        return schedule;
+//        return new Schedule(id.intValue(), schedule.getDateTime(), schedule.getTitle(), schedule.getMemo());
     }
 
     public List<Schedule> findByDate(LocalDate date) {
@@ -81,6 +82,8 @@ public class ScheduleRepository {
             final Schedule schedule = new Schedule(
                     rs.getInt("id"),
                     rs.getTimestamp("date_time").toLocalDateTime(),
+                    rs.getInt("start_time"),
+                    rs.getInt("end_time"),
                     rs.getString("title"),
                     rs.getString("memo"));
 

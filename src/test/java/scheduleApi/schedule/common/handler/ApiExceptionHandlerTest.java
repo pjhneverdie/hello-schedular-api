@@ -44,7 +44,7 @@ public class ApiExceptionHandlerTest {
                 "    \"memo\": \"memo\"\n" +
                 "}";
 
-        mockMvc.perform(post("/schedule")
+        mockMvc.perform(post("/schedules")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -53,17 +53,19 @@ public class ApiExceptionHandlerTest {
 
     @Test
     void handleValidationExceptionTest() throws Exception {
-        // 제목 누락
         final String requestBody = "{\n" +
                 "    \"dateTime\": \"2007-12-03T10:15:30\",\n" +
-                "    \"memo\": \"memo\"\n" +
+                "    \"startTime\": 1200,\n" +
+                "    \"endTime\": 1100,\n" +
+                "    \"title\": \"Valid Title\",\n" +
+                "    \"memo\": \"Valid Memo\"\n" +
                 "}";
 
-        mockMvc.perform(post("/schedule")
+        mockMvc.perform(post("/schedules")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("제목을 입력해 주세요."));
+                .andExpect(jsonPath("$.message").value("연일 일정은 아직 지원하지 않습니다."));
     }
 
 
@@ -80,7 +82,7 @@ public class ApiExceptionHandlerTest {
                 "    \"memo\": \"valid memo\"\n" +
                 "}";
 
-        mockMvc.perform(post("/schedule")
+        mockMvc.perform(post("/schedules")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isInternalServerError())

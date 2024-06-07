@@ -1,10 +1,12 @@
 package scheduleApi.schedule.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import scheduleApi.schedule.controller.validation.ValidationOrder;
 import scheduleApi.schedule.domain.Schedule;
 import scheduleApi.schedule.controller.form.ScheduleSaveForm;
 import scheduleApi.schedule.controller.form.ScheduleUpdateForm;
@@ -21,7 +23,7 @@ public class ScheduleController {
 
 
     @PostMapping
-    Schedule save(@Valid @RequestBody ScheduleSaveForm scheduleSaveForm) {
+    Schedule save(@Validated(ValidationOrder.class) @RequestBody ScheduleSaveForm scheduleSaveForm, BindingResult bindingResult) {
         return scheduleService.save(scheduleSaveForm);
     }
 
@@ -31,7 +33,7 @@ public class ScheduleController {
     }
 
     @PutMapping
-    void update(@Valid @RequestBody ScheduleUpdateForm scheduleUpdateForm) {
+    void update(@Validated(ValidationOrder.class) @RequestBody ScheduleUpdateForm scheduleUpdateForm) {
         scheduleService.update(scheduleUpdateForm);
     }
 
