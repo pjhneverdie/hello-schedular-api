@@ -5,13 +5,13 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import scheduleApi.schedule.common.validation.MinMax;
 import scheduleApi.schedule.controller.validation.TimeRangeConstraint;
-import scheduleApi.schedule.controller.validation.ValidationGroups;
+import scheduleApi.schedule.controller.validation.group.ValidationGroups;
 
 import java.time.LocalDateTime;
 
 @TimeRangeConstraint(groups = ValidationGroups.ValueRangeGroup.class)
 @Getter
-public class ScheduleSaveForm {
+public class ScheduleSaveForm implements TimeValidatedScheduleForm {
     @NotNull(message = "날짜를 입력해 주세요.", groups = ValidationGroups.NotNullGroup.class)
     private final LocalDateTime dateTime;
 
@@ -38,5 +38,15 @@ public class ScheduleSaveForm {
         this.endTime = endTime;
         this.title = title;
         this.memo = memo;
+    }
+
+    @Override
+    public int startTime() {
+        return this.startTime;
+    }
+
+    @Override
+    public int endTime() {
+        return this.endTime;
     }
 }

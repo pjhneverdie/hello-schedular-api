@@ -75,11 +75,12 @@ public class ApiExceptionHandlerTest {
                 .when(scheduleService)
                 .save(any(ScheduleSaveForm.class));
 
-        // 클라이언트는 잘못이 없음
         final String requestBody = "{\n" +
                 "    \"dateTime\": \"2007-12-03T10:15:30\",\n" +
-                "    \"title\": \"valid title\",\n" +
-                "    \"memo\": \"valid memo\"\n" +
+                "    \"startTime\": 1000,\n" +
+                "    \"endTime\": 1100,\n" +
+                "    \"title\": \"Valid Title\",\n" +
+                "    \"memo\": \"Valid Memo\"\n" +
                 "}";
 
         mockMvc.perform(post("/schedules")

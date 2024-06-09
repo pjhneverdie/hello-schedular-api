@@ -7,7 +7,7 @@ import jakarta.validation.ValidatorFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import scheduleApi.schedule.controller.validation.TimeRangeValidator;
+import scheduleApi.schedule.controller.validation.group.ValidationGroups;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -36,7 +36,8 @@ class TimeRangeValidatorTest {
                 "Memo"
         );
 
-        final Set<ConstraintViolation<ScheduleSaveForm>> violations = validator.validate(form);
+
+        final Set<ConstraintViolation<ScheduleSaveForm>> violations = validator.validate(form, ValidationGroups.ValueRangeGroup.class);
 
         assertFalse(violations.isEmpty());
 

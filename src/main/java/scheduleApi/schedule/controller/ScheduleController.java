@@ -6,7 +6,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import scheduleApi.schedule.controller.validation.ValidationOrder;
+import scheduleApi.schedule.controller.validation.group.ValidationOrder;
 import scheduleApi.schedule.domain.Schedule;
 import scheduleApi.schedule.controller.form.ScheduleSaveForm;
 import scheduleApi.schedule.controller.form.ScheduleUpdateForm;
@@ -21,9 +21,8 @@ import java.util.List;
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
-
     @PostMapping
-    Schedule save(@Validated(ValidationOrder.class) @RequestBody ScheduleSaveForm scheduleSaveForm, BindingResult bindingResult) {
+    Schedule save(@Validated(ValidationOrder.class) @RequestBody ScheduleSaveForm scheduleSaveForm) {
         return scheduleService.save(scheduleSaveForm);
     }
 

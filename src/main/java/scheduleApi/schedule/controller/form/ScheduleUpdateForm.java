@@ -3,15 +3,16 @@ package scheduleApi.schedule.controller.form;
 import jakarta.validation.constraints.*;
 
 import lombok.Getter;
+
 import scheduleApi.schedule.common.validation.MinMax;
 import scheduleApi.schedule.controller.validation.TimeRangeConstraint;
-import scheduleApi.schedule.controller.validation.ValidationGroups;
+import scheduleApi.schedule.controller.validation.group.ValidationGroups;
 
 import java.time.LocalDateTime;
 
 @TimeRangeConstraint(groups = ValidationGroups.ValueRangeGroup.class)
 @Getter
-public class ScheduleUpdateForm {
+public class ScheduleUpdateForm implements TimeValidatedScheduleForm {
     @NotNull(message = "id를 입력해 주세요.", groups = ValidationGroups.NotNullGroup.class)
     private final int id;
 
@@ -42,5 +43,15 @@ public class ScheduleUpdateForm {
         this.endTime = endTime;
         this.title = title;
         this.memo = memo;
+    }
+
+    @Override
+    public int startTime() {
+        return this.startTime;
+    }
+
+    @Override
+    public int endTime() {
+        return this.endTime;
     }
 }
