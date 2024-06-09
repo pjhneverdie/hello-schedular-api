@@ -20,8 +20,8 @@ public class ScheduleService {
     public Schedule save(ScheduleSaveForm scheduleSaveForm) {
         final Schedule schedule = new Schedule(
                 scheduleSaveForm.getDateTime(),
-                112,
-                122,
+                scheduleSaveForm.getStartTime(),
+                scheduleSaveForm.getEndTime(),
                 scheduleSaveForm.getTitle(),
                 scheduleSaveForm.getMemo());
 
@@ -36,8 +36,8 @@ public class ScheduleService {
         final Schedule schedule = new Schedule(
                 scheduleUpdateForm.getId(),
                 scheduleUpdateForm.getDateTime(),
-                112,
-                122,
+                scheduleUpdateForm.getStartTime(),
+                scheduleUpdateForm.getEndTime(),
                 scheduleUpdateForm.getTitle(),
                 scheduleUpdateForm.getMemo());
 

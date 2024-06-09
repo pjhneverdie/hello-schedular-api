@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="scheduleApi.schedule.repository.ScheduleMapper">
+
+    <resultMap id="ScheduleMap" type="Schedule">
+        <id property="id" column="id"/>
+        <result property="dateTime" column="date_time"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="title" column="title"/>
+        <result property="memo" column="memo"/>
+    </resultMap>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO schedule(date_time, start_time, end_time, title, memo)
+        VALUES (#{dateTime}, #{startTime}, #{endTime}, #{title}, #{memo})
+    </insert>
+
+    <select id="findByDate" resultMap="ScheduleMap">
+        SELECT *
+        FROM schedule
+        WHERE DATE(date_time) = #{date}
+    </select>
+
+    <update id="update">
+        UPDATE schedule
+        SET date_time = #{dateTime},
+        start_time = #{startTime},
+        end_time = #{endTime},
+        title = #{title},
+        memo = #{memo}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE
+        FROM schedule
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByDate">
+        DELETE
+        FROM schedule
+        WHERE DATE(date_time) = #{date}
+    </delete>
+
+</mapper>
