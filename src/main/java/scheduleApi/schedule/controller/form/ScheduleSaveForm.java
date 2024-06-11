@@ -16,12 +16,12 @@ public class ScheduleSaveForm implements TimeValidatedScheduleForm {
     private final LocalDateTime dateTime;
 
     @NotNull(message = "일정 시작 시간을 입력해 주세요.", groups = ValidationGroups.NotNullGroup.class)
-    @MinMax(min = 0, max = 1430, message = "일정 시작 시간은 00시 00분 ~ 23시 50분까지로 제한됩니다.",
+    @MinMax(min = 0, max = 1438, message = "일정 시작 시간은 00시 00분 ~ 23시 50분까지로 제한됩니다.",
             groups = ValidationGroups.ValueRangeGroup.class)
     private final int startTime;
 
     @NotNull(message = "일정 마무리 시간을 입력해 주세요.", groups = ValidationGroups.NotNullGroup.class)
-    @MinMax(min = 10, max = 1440, message = "일정 마무리 시간은 00시 10분 ~ 24시 00분까지로 제한됩니다.",
+    @MinMax(min = 1, max = 1439, message = "일정 마무리 시간은 00시 10분 ~ 24시 00분까지로 제한됩니다.",
             groups = ValidationGroups.ValueRangeGroup.class)
     private final int endTime;
 

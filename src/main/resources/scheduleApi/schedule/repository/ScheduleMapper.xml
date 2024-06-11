@@ -18,7 +18,7 @@
     </insert>
 
     <select id="findByDate" resultMap="ScheduleMap">
-        SELECT *
+        SELECT date_time, start_time, end_time, title, memo
         FROM schedule
         WHERE DATE(date_time) = #{date}
     </select>
