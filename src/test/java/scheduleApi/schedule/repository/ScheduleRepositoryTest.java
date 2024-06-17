@@ -25,15 +25,6 @@ class ScheduleRepositoryTest {
     @Autowired
     private ScheduleRepository repository;
 
-    @TestConfiguration
-    public static class TestConfig {
-
-        @Bean
-        public ScheduleRepository scheduleRepository(ScheduleMapper scheduleMapper) {
-            return new ScheduleRepository(scheduleMapper);
-        }
-    }
-
     @Test
     void contextLoads() {
         assertNotNull(repository);
@@ -42,13 +33,7 @@ class ScheduleRepositoryTest {
     @Test
     void save() {
         // Given
-        final Schedule schedule = new Schedule(
-                1,
-                LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul"))),
-                1200,
-                1400,
-                "title",
-                "memo");
+        final Schedule schedule = getSchedule();
 
         // When
         final Schedule saved = repository.save(schedule);
@@ -60,17 +45,10 @@ class ScheduleRepositoryTest {
     @Test
     void findByDate() {
         // Given
-        final Schedule schedule = new Schedule(
-                LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul"))),
-                1200,
-                1400,
-                "title",
-                "memo");
-
-        final Schedule saved = repository.save(schedule);
+        final Schedule saved = repository.save(getSchedule());
 
         // When
-        final List<Schedule> allByDate = repository.findByDate(saved.getDateTime().toLocalDate());
+        final List<Schedule> allByDate = repository.findByDate(saved.getStartTime().toLocalDate());
 
         // Then
         assertThat(allByDate).isNotEmpty();
@@ -79,71 +57,59 @@ class ScheduleRepositoryTest {
     @Test
     void update() {
         // Given
-        Schedule schedule = new Schedule(
-                LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul"))),
-                1200,
-                1400,
-                "title",
-                "memo");
-
-        final Schedule saved = repository.save(schedule);
+        final Schedule saved = repository.save(getSchedule());
 
         // When
-        schedule = new Schedule(
+        final LocalDateTime startTime = LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul")));
+        final LocalDateTime endTime = startTime.plusHours(1);
+
+        final Schedule schedule = new Schedule(
                 saved.getId(),
-                LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul"))),
-                1200,
-                1400,
-                "update",
-                "update");
+                startTime,
+                endTime,
+                "Title2",
+                "Memo2");
 
         repository.update(schedule);
 
         // Then
-        List<Schedule> allByDate = repository.findByDate(schedule.getDateTime().toLocalDate());
+        final List<Schedule> allByDate = repository.findByDate(schedule.getStartTime().toLocalDate());
 
-        assertThat(allByDate.get(0).getTitle().equals("update")).isTrue();
+        assertThat(allByDate.stream().allMatch(updated -> updated.getTitle().equals(schedule.getTitle()))).isTrue();
     }
 
     @Test
     void delete() {
         // Given
-        final Schedule schedule = new Schedule(
-                LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul"))),
-                1200,
-                1400,
-                "title",
-                "memo");
-
-        final Schedule saved = repository.save(schedule);
+        final Schedule saved = repository.save(getSchedule());
 
         // When
         repository.delete(saved.getId());
 
         // Then
-        final List<Schedule> allByDate = repository.findByDate(saved.getDateTime().toLocalDate());
+        final List<Schedule> allByDate = repository.findByDate(saved.getStartTime().toLocalDate());
 
-        assertThat(allByDate.contains(schedule)).isFalse();
+        assertThat(allByDate.stream().noneMatch(schedule -> schedule.getId().equals(saved.getId()))).isTrue();
     }
 
     @Test
     void deleteByDate() {
         // Given
-        final Schedule schedule = new Schedule(
-                LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul"))),
-                1200,
-                1400,
-                "title",
-                "memo");
-
-        final Schedule saved = repository.save(schedule);
+        final Schedule saved = repository.save(getSchedule());
 
         // When
-        repository.deleteByDate(saved.getDateTime().toLocalDate());
+        repository.deleteByDate(saved.getStartTime().toLocalDate());
 
         // Then
-        final List<Schedule> allByDate = repository.findByDate(saved.getDateTime().toLocalDate());
+        final List<Schedule> allByDate = repository.findByDate(saved.getStartTime().toLocalDate());
 
         assertThat(allByDate).isEmpty();
+    }
+
+    private Schedule getSchedule() {
+        final LocalDateTime startTime = LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul")));
+        final LocalDateTime endTime = startTime.plusHours(1);
+
+        return new Schedule(startTime, endTime, "Title", "Memo");
     }
 }

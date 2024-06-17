@@ -7,7 +7,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import scheduleApi.schedule.controller.form.ScheduleSaveForm;
+import scheduleApi.schedule.controller.form.ScheduleForm;
 import scheduleApi.schedule.service.ScheduleService;
 import scheduleApi.schedule.exception.ScheduleErrorCode;
 
@@ -37,9 +37,9 @@ public class ApiExceptionHandlerTest {
 
     @Test
     void handleBindExceptionTest() throws Exception {
-        // 타입 미스매치
         final String requestBody = "{\n" +
-                "    \"dateTime\": \"dateTime\",\n" +
+                "    \"startTime\": \"dateTime\",\n" +
+                "    \"endTime\": \"dateTime\",\n" +
                 "    \"title\": \"title\",\n" +
                 "    \"memo\": \"memo\"\n" +
                 "}";
@@ -54,18 +54,17 @@ public class ApiExceptionHandlerTest {
     @Test
     void handleValidationExceptionTest() throws Exception {
         final String requestBody = "{\n" +
-                "    \"dateTime\": \"2007-12-03T10:15:30\",\n" +
-                "    \"startTime\": 1200,\n" +
-                "    \"endTime\": 1100,\n" +
-                "    \"title\": \"Valid Title\",\n" +
-                "    \"memo\": \"Valid Memo\"\n" +
+                "    \"startTime\": \"2007-12-03T10:15:30\",\n" +
+                "    \"endTime\": \"2007-12-03T10:15:40\",\n" +
+                "    \"title\": \"\",\n" +
+                "    \"memo\": \"memo\"\n" +
                 "}";
 
         mockMvc.perform(post("/schedules")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("연일 일정은 아직 지원하지 않습니다."));
+                .andExpect(jsonPath("$.message").value("제목을 입력해 주세요."));
     }
 
 
@@ -73,14 +72,13 @@ public class ApiExceptionHandlerTest {
     void handleCustomExceptionTest() throws Exception {
         doThrow(ScheduleErrorCode.SOME_SCHEDULE_ERROR.exception())
                 .when(scheduleService)
-                .save(any(ScheduleSaveForm.class));
+                .save(any(ScheduleForm.class));
 
         final String requestBody = "{\n" +
-                "    \"dateTime\": \"2007-12-03T10:15:30\",\n" +
-                "    \"startTime\": 1000,\n" +
-                "    \"endTime\": 1100,\n" +
-                "    \"title\": \"Valid Title\",\n" +
-                "    \"memo\": \"Valid Memo\"\n" +
+                "    \"startTime\": \"2007-12-03T10:15:30\",\n" +
+                "    \"endTime\": \"2007-12-03T10:15:40\",\n" +
+                "    \"title\": \"valid title\",\n" +
+                "    \"memo\": \"valid memo\"\n" +
                 "}";
 
         mockMvc.perform(post("/schedules")

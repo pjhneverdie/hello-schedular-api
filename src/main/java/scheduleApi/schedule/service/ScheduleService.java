@@ -2,24 +2,22 @@ package scheduleApi.schedule.service;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.stereotype.Service;
-
-import scheduleApi.schedule.domain.Schedule;
-import scheduleApi.schedule.controller.form.ScheduleSaveForm;
-import scheduleApi.schedule.controller.form.ScheduleUpdateForm;
-import scheduleApi.schedule.repository.ScheduleRepository;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import scheduleApi.schedule.controller.form.ScheduleForm;
+import scheduleApi.schedule.domain.Schedule;
+import scheduleApi.schedule.repository.ScheduleRepository;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
-    public Schedule save(ScheduleSaveForm scheduleSaveForm) {
+    public Schedule save(ScheduleForm scheduleSaveForm) {
         final Schedule schedule = new Schedule(
-                scheduleSaveForm.getDateTime(),
                 scheduleSaveForm.getStartTime(),
                 scheduleSaveForm.getEndTime(),
                 scheduleSaveForm.getTitle(),
@@ -32,10 +30,9 @@ public class ScheduleService {
         return scheduleRepository.findByDate(date);
     }
 
-    public void update(ScheduleUpdateForm scheduleUpdateForm) {
+    public void update(ScheduleForm scheduleUpdateForm) {
         final Schedule schedule = new Schedule(
                 scheduleUpdateForm.getId(),
-                scheduleUpdateForm.getDateTime(),
                 scheduleUpdateForm.getStartTime(),
                 scheduleUpdateForm.getEndTime(),
                 scheduleUpdateForm.getTitle(),

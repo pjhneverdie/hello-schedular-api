@@ -2,10 +2,9 @@ package scheduleApi.schedule.controller.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import scheduleApi.schedule.controller.form.ScheduleForm;
 
-import scheduleApi.schedule.controller.form.TimeValidatedScheduleForm;
-
-public class TimeRangeValidator implements ConstraintValidator<TimeRangeConstraint, TimeValidatedScheduleForm> {
+public class TimeRangeValidator implements ConstraintValidator<TimeRangeConstraint, ScheduleForm> {
 
     @Override
     public void initialize(TimeRangeConstraint constraintAnnotation) {
@@ -13,8 +12,7 @@ public class TimeRangeValidator implements ConstraintValidator<TimeRangeConstrai
     }
 
     @Override
-    public boolean isValid(TimeValidatedScheduleForm timeValidatedScheduleForm, ConstraintValidatorContext constraintValidatorContext) {
-        return timeValidatedScheduleForm != null &&
-                timeValidatedScheduleForm.startTime() < timeValidatedScheduleForm.endTime();
+    public boolean isValid(ScheduleForm scheduleForm, ConstraintValidatorContext constraintValidatorContext) {
+        return scheduleForm.getEndTime().isAfter(scheduleForm.getStartTime());
     }
 }

@@ -6,31 +6,24 @@ import java.time.LocalDateTime;
 
 @Getter
 public class Schedule {
-    private Integer id;
+    private final Integer id;
 
-    private final LocalDateTime dateTime;
+    private final LocalDateTime startTime;
 
-    private final int startTime;
-
-    private final int endTime;
+    private final LocalDateTime endTime;
 
     private final String title;
 
     private final String memo;
 
     // save
-    public Schedule(LocalDateTime dateTime, int startTime, int endTime, String title, String memo) {
-        this.dateTime = dateTime;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.title = title;
-        this.memo = memo;
+    public Schedule(LocalDateTime startTime, LocalDateTime endTime, String title, String memo) {
+        this(null, startTime, endTime, title, memo);
     }
 
-    // read
-    public Schedule(int id, LocalDateTime dateTime, int startTime, int endTime, String title, String memo) {
+    // update
+    public Schedule(Integer id, LocalDateTime startTime, LocalDateTime endTime, String title, String memo) {
         this.id = id;
-        this.dateTime = dateTime;
         this.startTime = startTime;
         this.endTime = endTime;
         this.title = title;

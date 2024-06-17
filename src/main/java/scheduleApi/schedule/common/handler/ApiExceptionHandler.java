@@ -33,8 +33,6 @@ public class ApiExceptionHandler {
         BAD_REQUEST("파람, 바디 등 양식을 다시 확인해 주세요!", HttpStatus.BAD_REQUEST),
         INTERNAL_SERVER_ERROR("서버에 문제가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
-        // HttpRequestMethodNotSupportedException도 추가해야 할 듯
-
         @Override
         public String message() {
             return message;
@@ -87,7 +85,7 @@ public class ApiExceptionHandler {
 
     // 나머지 예외 처리
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleServerException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleServerException() {
         final ErrorResponse errorResponse = new ErrorResponse(
                 GlobalErrorCode.INTERNAL_SERVER_ERROR.toCustomException());
 
@@ -96,7 +94,7 @@ public class ApiExceptionHandler {
 
     // 요청 URL 매칭 불가한 상황
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFoundException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleNotFoundException() {
         final ErrorResponse errorResponse = new ErrorResponse(
                 GlobalErrorCode.NOT_FOUND.toCustomException());
 
@@ -105,7 +103,7 @@ public class ApiExceptionHandler {
 
     // 바인딩 예외 처리(요청 객체의 타입이 필드와 일치하지 않을 때)
     @ExceptionHandler(HttpMessageConversionException.class)
-    public ResponseEntity<ErrorResponse> handleBindException() {
+    public ResponseEntity<ErrorResponse> handleBindException(HttpMessageConversionException err) {
         final ErrorResponse errorResponse = new ErrorResponse(
                 GlobalErrorCode.BAD_REQUEST.toCustomException());
 
@@ -115,10 +113,10 @@ public class ApiExceptionHandler {
 
     // 벨리데이션 예외 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException err) {
         // 벨리데이션 실패 메시지 추출
         // * getAllErrors = 클래스 레벨 예외도 포함해서 가져오기
-        final List<String> errorMessages = e.getBindingResult().getAllErrors().stream().map(
+        final List<String> errorMessages = err.getBindingResult().getAllErrors().stream().map(
                 fieldError -> fieldError.getDefaultMessage() != null ?
                         fieldError.getDefaultMessage() :
                         // 벨리데이션 실패 메시지가 따로 정의되지 않은 경우
@@ -133,8 +131,8 @@ public class ApiExceptionHandler {
 
     // 커스텀 예외 처리
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
-        final ErrorResponse errorResponse = new ErrorResponse(e);
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomException err) {
+        final ErrorResponse errorResponse = new ErrorResponse(err);
         return new ResponseEntity<>(errorResponse, errorResponse.getEnumHttpStatus());
     }
 }
