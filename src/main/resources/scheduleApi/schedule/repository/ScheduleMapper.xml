@@ -11,7 +11,7 @@
     <select id="findByDate" resultType="Schedule">
         SELECT id, start_time, end_time, title, memo
         FROM schedule
-        WHERE DATE(start_time) = #{date}
+        WHERE DATE_FORMAT(start_time, '%Y-%m') = DATE_FORMAT(#{date}, '%Y-%m')
     </select>
 
     <update id="update">
